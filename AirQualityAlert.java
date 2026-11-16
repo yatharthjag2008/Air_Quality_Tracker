@@ -3,6 +3,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import com.google.gson.Gson;
 
 public class AirQualityAlert {
 
@@ -11,9 +12,16 @@ public class AirQualityAlert {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
+    private static final Gson gson = new Gson();
+
+    record Location(String status, String message, String city, double lat, double lon) {}
+
+
+
     public static void main(String[] args) {
         String locationJson = getUserLocation();
-       IO.println(locationJson);
+        Location location = parseCoordinates(locationJson);
+        IO.println("You're near " + location.city() + " (" + location.lat() + ", " + location.lon() + ")");
     }
 
     
@@ -41,4 +49,26 @@ public class AirQualityAlert {
             return null; 
         }
     }
-}
+
+    public static Location parseCoordinates(String json) {
+       
+        Location location = gson.fromJson(json, Location.class);
+
+        if (location == null) {
+            IO.println("Error: Could not find your location - empty reply");
+            System.exit(1);
+        }
+
+        if (!location.status().equals("success")) {
+            IO.println("Error: Could not find your location - " + location.message());
+            System.exit(1);
+        }
+
+
+        return location;
+    
+        
+    }
+
+        
+    }
