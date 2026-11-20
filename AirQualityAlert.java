@@ -22,6 +22,8 @@ public class AirQualityAlert {
         String locationJson = getUserLocation();
         Location location = parseCoordinates(locationJson);
         IO.println("You're near " + location.city() + " (" + location.lat() + ", " + location.lon() + ")");
+
+        String airQualityJson = fetchAirQuality(location.lat(), location.lon());
     }
 
     
@@ -66,8 +68,34 @@ public class AirQualityAlert {
 
 
         return location;
-    
-        
+
+
+    }
+
+    public static String fetchAirQuality(double lat, double lon) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://air-quality-api.open-meteo.com/v1/air-quality"
+                            + "?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi"))
+                    .timeout(Duration.ofSeconds(10))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                IO.println("Error: Air quality request failed (HTTP " + response.statusCode() + ")");
+                System.exit(1);
+            }
+
+            return response.body();
+
+        } catch (Exception e) {
+            IO.println("Error: Could not get the air quality - " + e.getMessage());
+            System.exit(1);
+            return null;
+        }
     }
 
         
