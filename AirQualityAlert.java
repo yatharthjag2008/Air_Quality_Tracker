@@ -4,6 +4,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 public class AirQualityAlert {
 
@@ -16,6 +17,10 @@ public class AirQualityAlert {
 
     record Location(String status, String message, String city, double lat, double lon) {}
 
+    record CurrentReading(@SerializedName("us_aqi") Integer usAqi) {}
+
+    record AirQuality(CurrentReading current) {}
+
 
 
     public static void main(String[] args) {
@@ -24,6 +29,8 @@ public class AirQualityAlert {
         IO.println("You're near " + location.city() + " (" + location.lat() + ", " + location.lon() + ")");
 
         String airQualityJson = fetchAirQuality(location.lat(), location.lon());
+        int aqi = parseAqi(airQualityJson);
+        IO.println("Current US AQI: " + aqi);
     }
 
     
@@ -96,6 +103,17 @@ public class AirQualityAlert {
             System.exit(1);
             return null;
         }
+    }
+
+    public static int parseAqi(String json) {
+        AirQuality airQuality = gson.fromJson(json, AirQuality.class);
+
+        if (airQuality == null || airQuality.current() == null || airQuality.current().usAqi() == null) {
+            IO.println("Error: No air quality reading is available for your location");
+            System.exit(1);
+        }
+
+        return airQuality.current().usAqi();
     }
 
         
