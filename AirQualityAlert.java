@@ -33,6 +33,14 @@ public class AirQualityAlert {
         IO.println("Current US AQI: " + aqi);
 
         int warningLevel = askWarningLevel();
+
+        boolean aboveWarningLevel = isAboveWarningLevel(aqi, warningLevel);
+
+        if (aboveWarningLevel) {
+            // Box 8: show a warning and a health tip
+        } else {
+            // Box 9: show that the air is currently safe
+        }
     }
 
     
@@ -157,6 +165,11 @@ public class AirQualityAlert {
                 IO.println("Please enter a whole number, like 100.");
             }
         }
+    }
+
+    // Returns true when the current AQI is above the user's warning level
+    public static boolean isAboveWarningLevel(int aqi, int warningLevel) {
+        return aqi > warningLevel;
     }
 
         
