@@ -31,6 +31,8 @@ public class AirQualityAlert {
         String airQualityJson = fetchAirQuality(location.lat(), location.lon());
         int aqi = parseAqi(airQualityJson);
         IO.println("Current US AQI: " + aqi);
+
+        int warningLevel = askWarningLevel();
     }
 
     
@@ -130,6 +132,30 @@ public class AirQualityAlert {
             return "Very Unhealthy";
         } else {
             return "Hazardous";
+        }
+    }
+
+    // Asks for an AQI warning level and keeps asking until it gets a whole number from 0 to 500
+    public static int askWarningLevel() {
+        while (true) {
+            String input = IO.readln("Warn me when the AQI is above (0 - 500): ");
+
+            if (input == null) {
+                IO.println("Error: No warning level was entered");
+                System.exit(1);
+            }
+
+            try {
+                int level = Integer.parseInt(input.strip());
+
+                if (level >= 0 && level <= 500) {
+                    return level;
+                }
+
+                IO.println("Please enter a number from 0 to 500.");
+            } catch (NumberFormatException e) {
+                IO.println("Please enter a whole number, like 100.");
+            }
         }
     }
 
