@@ -6,6 +6,7 @@ import java.time.Duration;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+
 public class AirQualityAlert {
 
     
@@ -37,7 +38,7 @@ public class AirQualityAlert {
         boolean aboveWarningLevel = isAboveWarningLevel(aqi, warningLevel);
 
         if (aboveWarningLevel) {
-            // Box 8: show a warning and a health tip
+            showWarning(aqi, warningLevel);
         } else {
             // Box 9: show that the air is currently safe
         }
@@ -170,6 +171,28 @@ public class AirQualityAlert {
     // Returns true when the current AQI is above the user's warning level
     public static boolean isAboveWarningLevel(int aqi, int warningLevel) {
         return aqi > warningLevel;
+    }
+
+    public static void showWarning(int aqi, int warningLevel) {
+        IO.println("Warning: The air is " + describeAqi(aqi) + " (AQI " + aqi
+                + "), which is above your warning level of " + warningLevel + ".");
+        IO.println("Tip: " + healthTip(aqi));
+    }
+
+    public static String healthTip(int aqi) {
+        if (aqi <= 50) {
+            return "The air is still good, so it's fine to be active outside.";
+        } else if (aqi <= 100) {
+            return "If you are unusually sensitive to air pollution, take it easier during long or hard activity outside.";
+        } else if (aqi <= 150) {
+            return "Children, older adults, and people with asthma or heart or lung disease should cut back on long or hard activity outside.";
+        } else if (aqi <= 200) {
+            return "Cut back on long or hard activity outside, and take more breaks.";
+        } else if (aqi <= 300) {
+            return "Avoid long or hard activity outside, and move what you can indoors.";
+        } else {
+            return "Stay indoors and avoid all activity outside.";
+        }
     }
 
         
