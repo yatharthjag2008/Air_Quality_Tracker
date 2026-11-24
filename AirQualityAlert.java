@@ -40,7 +40,7 @@ public class AirQualityAlert {
         if (aboveWarningLevel) {
             showWarning(aqi, warningLevel);
         } else {
-            // Box 9: show that the air is currently safe
+            showSafe(aqi, warningLevel);
         }
     }
 
@@ -177,6 +177,11 @@ public class AirQualityAlert {
         IO.println("Warning: The air is " + describeAqi(aqi) + " (AQI " + aqi
                 + "), which is above your warning level of " + warningLevel + ".");
         IO.println("Tip: " + healthTip(aqi));
+    }
+
+    public static void showSafe(int aqi, int warningLevel) {
+        IO.println("Safe: The air is " + describeAqi(aqi) + " (AQI " + aqi
+                + "), which is at or below your warning level of " + warningLevel + ".");
     }
 
     public static String healthTip(int aqi) {
