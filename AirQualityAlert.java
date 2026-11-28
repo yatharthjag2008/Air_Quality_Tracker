@@ -5,6 +5,9 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 public class AirQualityAlert {
@@ -23,7 +26,7 @@ public class AirQualityAlert {
     record AirQuality(CurrentReading current) {}
 
 
-
+    // main method
     public static void main(String[] args) {
         String locationJson = getUserLocation();
         Location location = parseCoordinates(locationJson);
@@ -44,7 +47,7 @@ public class AirQualityAlert {
         }
     }
 
-    
+    // gets the user's location from the ip-api.com API
     public static String getUserLocation() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -70,6 +73,8 @@ public class AirQualityAlert {
         }
     }
 
+
+    // parses the JSON from the location API and returns a locatiion object
     public static Location parseCoordinates(String json) {
        
         Location location = gson.fromJson(json, Location.class);
@@ -90,6 +95,7 @@ public class AirQualityAlert {
 
     }
 
+    // gets the air quality JSON from the Open-Meteo API
     public static String fetchAirQuality(double lat, double lon) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -116,6 +122,7 @@ public class AirQualityAlert {
         }
     }
 
+    // parses the JSON from the air quality API and returns the aqi
     public static int parseAqi(String json) {
         AirQuality airQuality = gson.fromJson(json, AirQuality.class);
 
@@ -173,17 +180,21 @@ public class AirQualityAlert {
         return aqi > warningLevel;
     }
 
+
+    // shows the air quality is not safe according to the user's warning level
     public static void showWarning(int aqi, int warningLevel) {
         IO.println("Warning: The air is " + describeAqi(aqi) + " (AQI " + aqi
                 + "), which is above your warning level of " + warningLevel + ".");
         IO.println("Tip: " + healthTip(aqi));
     }
 
+    // shows the air quality is safe according to the user's warning level
     public static void showSafe(int aqi, int warningLevel) {
         IO.println("Safe: The air is " + describeAqi(aqi) + " (AQI " + aqi
                 + "), which is at or below your warning level of " + warningLevel + ".");
     }
 
+    // Based on aqi, displays the appropriate health tip
     public static String healthTip(int aqi) {
         if (aqi <= 50) {
             return "The air is still good, so it's fine to be active outside.";
@@ -200,5 +211,28 @@ public class AirQualityAlert {
         }
     }
 
-        
+
     }
+
+
+// JUnit tests for the methods that don't need the internet
+class AirQualityAlertTest {
+
+    // 50 is the highest AQI that still counts as Good
+    @Test
+    void describeAqiWorks() {
+        assertEquals("Good", AirQualityAlert.describeAqi(50));
+    }
+
+    // 301 is the lowest AQI that counts as Hazardous
+    @Test
+    void healthTipWorks() {
+        assertEquals("Stay indoors and avoid all activity outside.", AirQualityAlert.healthTip(301));
+    }
+
+    // An AQI equal to the warning level counts as safe
+    @Test
+    void isAboveWarningLevelWorks() {
+        assertFalse(AirQualityAlert.isAboveWarningLevel(100, 100));
+    }
+}
